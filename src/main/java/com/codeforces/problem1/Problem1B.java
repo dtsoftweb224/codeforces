@@ -9,9 +9,8 @@ import java.util.regex.Pattern;
  */
 public class Problem1B {
 
-    private static final int maxIndex = 5;
-
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
         int i = 0;
         if (sc.hasNext()) {
@@ -29,11 +28,10 @@ public class Problem1B {
 
     public static String convertStr(String strIn) {
 
-        int indR = strIn.indexOf("R");
-        int indC = strIn.indexOf("C");
-        if (indR != -1 && indC != -1 && indC - indR > 1) {
+        if (strIn.indexOf("R") != -1 && strIn.indexOf("C") != -1 &&
+                strIn.indexOf("C") - strIn.indexOf("R") > 1) {
             /* Формат RxCy */
-            return convertFromRC(strIn, indR, indC);
+            return convertFromRC(strIn, strIn.indexOf("R"), strIn.indexOf("C"));
         } else {
             /* Формат BCxy */
             return convertInRC(strIn);
@@ -49,24 +47,32 @@ public class Problem1B {
 
         long row = Integer.valueOf(strIn.substring(indexR + 1, indexC));
         long col = Integer.valueOf(strIn.substring(indexC + 1, strIn.length()));
-        int index = 0;
+        int maxIndex = 5;
 
         if (col > 26) {
             StringBuilder strCol = new StringBuilder();
 
-            if (Math.cbrt(col) > 0) {
-                index = 3;
-            } else {
-
+            while (col - Math.pow(26, maxIndex) < 0) {
+                maxIndex--;
             }
             // Формирование символьного представления
-            while (index > 0) {
-
-                index--;
+            while (maxIndex >= 0) {
+                long a = (long) (col/Math.pow(26, maxIndex));
+                if (a == 0) {
+                    strCol.append('Z');
+                } else {
+                    if (col%Math.pow(26, maxIndex) == 0 && maxIndex > 0) {
+                        strCol.append((char) (a - 1 + 64));
+                    } else {
+                        strCol.append((char) (a + 64));
+                    }
+                }
+                col = (long) (col - a*Math.pow(26, maxIndex));
+                maxIndex--;
             }
             return strCol.toString() + String.valueOf(row);
         } else {
-            return (char)col + 64 + String.valueOf(row);
+            return (char)(col + 64) + String.valueOf(row);
         }
     }
 
@@ -99,8 +105,4 @@ public class Problem1B {
 
         return "R" + row + "C" + colNumber;
     }
-
-//    private static int searchMaxIndex(long n) {
-//
-//    }
 }

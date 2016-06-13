@@ -12,11 +12,13 @@ public class TestProblem1B {
     @Test
     public void testProblem1B() {
         Problem1B problem1B = new Problem1B();
-//        assertEquals(problem1B.convertStr("R23C74"), "BV23");
-//        assertEquals(problem1B.convertStr("R23C35"), "AP23");
-//        assertEquals(problem1B.convertStr("R23C55"), "BC23");
-//        assertEquals(problem1B.convertStr("R23C27"), "AA23");
+        assertEquals(problem1B.convertStr("R98C1364"), "AZL98"); // Проверен
+//        assertEquals(problem1B.convertStr("R228C494"), "RZ228");
+//        assertEquals(problem1B.convertStr("R23C55"), "BC23"); // Проверен
+//        assertEquals(problem1B.convertStr("R23C27"), "AA23"); // Проверен
 //        assertEquals(problem1B.convertStr("R901C910"), "AHZ901");
-        assertEquals(problem1B.convertStr("BC23"), "R23C55");
+//        assertEquals(problem1B.convertStr("BC23"), "R23C55");
     }
+
+
 }

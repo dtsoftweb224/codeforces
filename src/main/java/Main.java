@@ -1,13 +1,11 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by HP-PK on 21.05.2016.
  */
 public class Main {
-
-    private static HashMap<String, Integer> gameResult = new HashMap<String, Integer>();
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -19,37 +17,91 @@ public class Main {
         if (i > 0) {
             while (i > 0) {
                 String strIn = sc.next();
-                int b = sc.nextInt();
-                gameHod(strIn + " " + b);
+                System.out.println(convertStr(strIn));
                 i--;
             }
         }
-        System.out.println(gameItog());
     }
 
-    private static void gameHod(String hodRound) {
+    public static String convertStr(String strIn) {
 
-        String name = hodRound.substring(0, hodRound.indexOf(" "));
-        Integer point = Integer.valueOf(hodRound.substring(hodRound.indexOf(" ") + 1));
-        if (point > 0) {
-            if (gameResult.containsKey(name)) {
-                int a = gameResult.get(name);
-                gameResult.put(name, a + point);
-            } else {
-                gameResult.put(name, point);
-            }
+//        int indR = strIn.indexOf("R");
+//        int indC = strIn.indexOf("C");
+        if (strIn.indexOf("R") != -1 && strIn.indexOf("C") != -1 &&
+                strIn.indexOf("C") - strIn.indexOf("R") > 1) {
+            /* Формат RxCy */
+            return convertFromRC(strIn, strIn.indexOf("R"), strIn.indexOf("C"));
+        } else {
+            /* Формат BCxy */
+            return convertInRC(strIn);
         }
     }
 
-    private static String gameItog() {
-        Map.Entry<String,Integer> maxEntry = null;
+    /**
+     * Преобразование из формата RxCy в формат Excel
+     * @param strIn
+     * @return
+     */
+    private static String convertFromRC(String strIn, int indexR, int indexC) {
 
-        for(Map.Entry<String,Integer> entry : gameResult.entrySet()) {
-            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
-                maxEntry = entry;
+        long row = Integer.valueOf(strIn.substring(indexR + 1, indexC));
+        long col = Integer.valueOf(strIn.substring(indexC + 1, strIn.length()));
+        int maxIndex = 5;
+
+        if (col > 26) {
+            StringBuilder strCol = new StringBuilder();
+
+            while (col - Math.pow(26, maxIndex) < 0) {
+                maxIndex--;
             }
+            // Формирование символьного представления
+            while (maxIndex >= 0) {
+                long a = (long) (col/Math.pow(26, maxIndex));
+                if (a == 0) {
+                    strCol.append('Z');
+                } else {
+                    if (col%Math.pow(26, maxIndex) == 0 && maxIndex > 0) {
+                        strCol.append((char) (a - 1 + 64));
+                    } else {
+                        strCol.append((char) (a + 64));
+                    }
+                }
+                col = (long) (col - a*Math.pow(26, maxIndex));
+                maxIndex--;
+            }
+            return strCol.toString() + String.valueOf(row);
+        } else {
+            return (char)(col + 64) + String.valueOf(row);
+        }
+    }
+
+    /**
+     * Преобразование из обычного формата Excel в RxCy
+     * @param strIn
+     * @return
+     */
+    private static String convertInRC(String strIn) {
+
+        int a = 0;
+        String col = "";
+        String row = "";
+        Pattern pattern = Pattern.compile("[0-9]");
+        Matcher matcherStr = pattern.matcher(strIn);
+        /* Номер строки */
+        if(matcherStr.find()) {
+            // Совпадаение найдено
+            a = matcherStr.start();
+            col = strIn.substring(0, a);
+            row = strIn.substring(a);
         }
 
-        return maxEntry.getKey();
+        int colNumber = 0;
+        int index = col.length() - 1;
+        for (int i = 0; i < col.length(); i++) {
+            colNumber += ((int) col.charAt(index) - 64) * Math.pow(26, i);
+            index--;
+        }
+
+        return "R" + row + "C" + colNumber;
     }
 }
